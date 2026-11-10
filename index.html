@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMZ Kreatif · BayuOne Planner</title>
+<style>
+  :root {
+    --deep-green: #1a3c34;
+    --mid-green: #2d6a4f;
+    --soft-green: #b7e4c7;
+    --sand: #d4a373;
+    --sand-light: #fefae0;
+    --warm-white: #fdfbf7;
+    --text-dark: #2b2b2b;
+    --text-mid: #5c5c5c;
+    --text-light: #8a8a8a;
+    --border: #e0d9cc;
+    --posted: #2d6a4f;
+    --draft: #d4a373;
+    --empty: #e9e4da;
+    --shadow: 0 2px 12px rgba(26, 60, 52, 0.08);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--warm-white);
+    color: var(--text-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* subtle Islamic geometric pattern overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0L50 15L65 10L60 25L75 35L60 40L65 55L50 50L40 65L30 50L15 55L20 40L5 35L20 25L15 10L30 15Z' fill='%231a3c34' fill-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== HEADER / MISSION ===== */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header .bismillah {
+    font-size: 22px;
+    color: var(--mid-green);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--deep-green);
+    letter-spacing: -0.5px;
+  }
+  .header .mission {
+    margin-top: 14px;
+    background: var(--deep-green);
+    color: #fff;
+    padding: 16px 22px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    line-height: 1.7;
+    box-shadow: var(--shadow);
+    text-align: left;
+  }
+  .header .mission strong {
+    color: var(--sand);
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .header .mission .brands {
+    color: var(--soft-green);
+    font-weight: 600;
+  }
+
+  /* ===== SURAH CARD ===== */
+  .surah-card {
+    background: linear-gradient(135deg, #f0f7f2 0%, var(--warm-white) 100%);
+    border: 1px solid var(--soft-green);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .surah-card .surah-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--deep-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .surah-card .arabic {
+    font-size: 22px;
+    text-align: right;
+    direction: rtl;
+    color: var(--deep-green);
+    line-height: 2;
+    margin-bottom: 8px;
+    font-family: 'Traditional Arabic', 'Amiri', serif;
+  }
+  .surah-card .translation {
+    font-size: 13px;
+    color: var(--text-mid);
+    font-style: italic;
+    line-height: 1.7;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .surah-card .translation span {
+    color: var(--mid-green);
+    font-weight: 600;
+  }
+
+  /* ===== MONTH CONTROLS ===== */
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .controls h2 {
+    font-size: 19px;
+    color: var(--deep-green);
+    font-weight: 700;
+  }
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .month-nav button {
+    background: var(--deep-green);
+    color: #fff;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s;
+  }
+  .month-nav button:hover { background: var(--mid-green); }
+  .month-nav select {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    font-size: 14px;
+    color: var(--text-dark);
+    cursor: pointer;
+  }
+
+  /* ===== CALENDAR GRID ===== */
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .dow {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 0;
+  }
+  .day {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    min-height: 80px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  .day:hover {
+    border-color: var(--mid-green);
+    box-shadow: 0 2px 8px rgba(45, 106, 79, 0.12);
+    transform: translateY(-1px);
+  }
+  .day.outside {
+    background: #faf8f4;
+    border-color: #f0ebe3;
+    cursor: default;
+    opacity: 0.4;
+  }
+  .day.outside:hover { transform: none; box-shadow: none; border-color: #f0ebe3; }
+  .day .num {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+  .day .status-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .day .status-badge.posted {
+    background: var(--posted);
+    color: #fff;
+  }
+  .day .status-badge.draft {
+    background: var(--draft);
+    color: #fff;
+  }
+  .day .status-badge.empty {
+    background: var(--empty);
+    color: var(--text-light);
+  }
+  .day .platform-hint {
+    font-size: 9.5px;
+    color: var(--text-light);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .day.today {
+    border-color: var(--sand);
+    border-width: 2px;
+  }
+  .day.today .num { color: var(--sand); }
+
+  /* ===== STATUS LEGEND ===== */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--text-mid);
+  }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend .dot {
+    width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+  }
+  .legend .dot.posted { background: var(--posted); }
+  .legend .dot.draft { background: var(--draft); }
+  .legend .dot.empty { background: var(--empty); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 60, 52, 0.4);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 12px 40px rgba(26, 60, 52, 0.2);
+    border: 1px solid var(--border);
+    margin: auto;
+  }
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--deep-green);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .modal-header h3 {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+  }
+  .modal-header button {
+    background: none;
+    border: none;
+    color: var(--soft-green);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+  }
+  .modal-header button:hover { color: #fff; }
+  .modal-body {
+    padding: 20px;
+  }
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-mid);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .field textarea, .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--text-dark);
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+  .field textarea:focus, .field select:focus {
+    outline: none;
+    border-color: var(--mid-green);
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+  }
+  .field textarea { min-height: 100px; line-height: 1.6; }
+  .field .copy-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--deep-green);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--mid-green); }
+  .btn-secondary {
+    background: var(--sand);
+    color: #fff;
+  }
+  .btn-secondary:hover { background: #c08a5a; }
+  .btn-ghost {
+    background: #fff;
+    color: var(--text-mid);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--sand-light); border-color: var(--sand); }
+  .btn-danger {
+    background: #fff;
+    color: #b33a3a;
+    border: 1px solid #e8c4c4;
+  }
+  .btn-danger:hover { background: #fdf0f0; }
+  .btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== TOAST ===== */
+  .toast-wrap {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  .toast {
+    background: var(--deep-green);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(26, 60, 52, 0.25);
+    animation: toastIn 0.2s ease;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    .app { padding: 16px 12px 60px; }
+    .header h1 { font-size: 20px; }
+    .header .mission { font-size: 12.5px; padding: 12px 16px; }
+    .surah-card .arabic { font-size: 18px; }
+    .surah-card .translation { font-size: 12px; }
+    .calendar { gap: 3px; }
+    .day { min-height: 64px; padding: 6px 5px; }
+    .day .num { font-size: 13px; }
+    .day .status-badge { font-size: 8px; padding: 1px 4px; }
+    .day .platform-hint { display: none; }
+    .controls h2 { font-size: 16px; }
+    .month-nav select { font-size: 12px; padding: 5px 6px; }
+  }
+
+  .hidden { display: none !important; }
+  .mt-2 { margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <h1>NMZ Kreatif · BayuOne</h1>
+    <div class="mission">
+      <strong>Our Mission</strong>
+      Consistently share beneficial content every day. Build <span class="brands">NMZ Kreatif</span> and <span class="brands">BayuOne</span> with intention, discipline, and barakah. One post at a time, one day at a time.
+    </div>
+  </div>
+
+  <!-- SURAH AL-INSHIRAH -->
+  <div class="surah-card">
+    <div class="surah-title">Surah Al-Inshirah · The Relief · 94:5-6</div>
+    <div class="arabic">فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا</div>
+    <div class="translation">
+      <span>"For indeed, with hardship [will be] ease. Indeed, with hardship [will be] ease."</span>
+      — So when you feel stuck, keep going. Ease is already on its way.
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <h2 id="monthTitle">November 2026</h2>
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">‹</button>
+      <select id="monthSelect" onchange="jumpMonth()"></select>
+      <select id="yearSelect" onchange="jumpMonth()"></select>
+      <button onclick="changeMonth(1)">›</button>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span><span class="dot posted"></span> Posted</span>
+    <span><span class="dot draft"></span> Draft (editable)</span>
+    <span><span class="dot empty"></span> Empty</span>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="calendar" id="calendar"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Day Details</h3>
+      <button onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================
+   DATA LAYER (localStorage)
+   ============================================ */
+const STORAGE_KEY = 'nmz_bayuone_planner_v1';
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const PLATFORMS = ['Threads', 'TikTok', 'Facebook'];
+const BRANDS = ['NMZ Kreatif', 'BayuOne'];
+
+// Malaysia timezone (UTC+8)
+function todayISO() {
+  const now = new Date();
+  const myt = new Date(now.getTime() + (8 * 60 + now.getTimezoneOffset()) * 60000);
+  const y = myt.getFullYear();
+  const m = String(myt.getMonth() + 1).padStart(2, '0');
+  const d = String(myt.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+let state = loadState();
+let currentYear, currentMonth; // calendar view state
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  return { entries: {} };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getEntry(dateISO) {
+  return state.entries[dateISO] || null;
+}
+
+function setEntry(dateISO, data) {
+  state.entries[dateISO] = data;
+  saveState();
+}
+
+function deleteEntry(dateISO) {
+  delete state.entries[dateISO];
+  saveState();
+}
+
+/* ============================================
+   CALENDAR RENDER
+   ============================================ */
+function initCalendar() {
+  const today = todayISO();
+  const [y, m] = today.split('-').map(Number);
+  currentYear = y;
+  currentMonth = m - 1; // 0-indexed
+  renderCalendar();
+  populateSelects();
+}
+
+function populateSelects() {
+  const monthSel = document.getElementById('monthSelect');
+  const yearSel = document.getElementById('yearSelect');
+  monthSel.innerHTML = MONTHS.map((name, i) =>
+    `<option value="${i}" ${i === currentMonth ? 'selected' : ''}>${name}</option>`
+  ).join('');
+  const years = [];
+  for (let y = 2026; y <= 2031; y++) years.push(y);
+  yearSel.innerHTML = years.map(y =>
+    `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`
+  ).join('');
+}
+
+function jumpMonth() {
+  currentMonth = Number(document.getElementById('monthSelect').value);
+  currentYear = Number(document.getElementById('yearSelect').value);
+  renderCalendar();
+}
+
+function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentYear < 2026) { currentYear = 2026; currentMonth = 0; }
+  if (currentYear > 2031) { currentYear = 2031; currentMonth = 11; }
+  populateSelects();
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const title = document.getElementById('monthTitle');
+  title.textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+
+  const cal = document.getElementById('calendar');
+  const today = todayISO();
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+  const dows = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  let html = dows.map(d => `<div class="dow">${d}</div>`).join('');
+
+  // leading blanks
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="day outside"></div>`;
+  }
+
+  // actual days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const entry = getEntry(iso);
+    let statusClass = 'empty';
+    let statusLabel = 'Empty';
+    let platformHint = '';
+
+    if (entry) {
+      if (entry.status === 'posted') {
+        statusClass = 'posted';
+        statusLabel = 'Posted';
+      } else if (entry.status === 'draft') {
+        statusClass = 'draft';
+        statusLabel = 'Draft';
+      }
+      if (entry.platforms && entry.platforms.length) {
+        platformHint = entry.platforms.join(', ');
+      }
+      if (entry.brand) {
+        platformHint = entry.brand + (platformHint ? ' · ' + platformHint : '');
+      }
+    }
+
+    const isToday = iso === today;
+    html += `
+      <div class="day ${isToday ? 'today' : ''}" onclick="openDay('${iso}')">
+        <div>
+          <div class="num">${d}</div>
+          <div class="status-badge ${statusClass}">${statusLabel}</div>
+          ${platformHint ? `<div class="platform-hint">${escapeHtml(platformHint)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // trailing blanks to fill last row
+  const totalCells = firstDay + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let i = 0; i < remaining; i++) {
+    html += `<div class="day outside"></div>`;
+  }
+
+  cal.innerHTML = html;
+}
+
+/* ============================================
+   DAY MODAL
+   ============================================ */
+let activeDate = null;
+
+function openDay(iso) {
+  activeDate = iso;
+  const entry = getEntry(iso);
+  const overlay = document.getElementById('modalOverlay');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  const footer = document.getElementById('modalFooter');
+
+  const [y, m, d] = iso.split('-').map(Number);
+  const dateLabel = new Date(y, m - 1, d).toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  title.textContent = dateLabel;
+
+  if (!entry) {
+    // empty day — show create form
+    body.innerHTML = buildFormHTML(null);
+    footer.innerHTML = `
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEntry()">Save</button>
+    `;
+  } else {
+    // existing entry — show editable form
+    body.innerHTML = buildFormHTML(entry);
+    footer.innerHTML = `
+      <button class="btn btn-danger btn-sm" onclick="deleteEntryConfirm()">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEntry()">Save Changes</button>
+    `;
+  }
+
+  overlay.classList.add('open');
+}
+
+function buildFormHTML(entry) {
+  const caption = entry ? escapeHtml(entry.caption || '') : '';
+  const prompt = entry ? escapeHtml(entry.prompt || '') : '';
+  const brand = entry ? entry.brand : BRANDS[0];
+  const platforms = entry ? (entry.platforms || []) : [];
+  const status = entry ? entry.status : 'draft';
+
+  return `
+    <div class="field">
+      <label>Brand / Account</label>
+      <select id="entryBrand">
+        ${BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Platform</label>
+      <select id="entryPlatform">
+        <option value="">— Select platform —</option>
+        ${PLATFORMS.map(p => `<option value="${p}" ${platforms.includes(p) ? 'selected' : ''}>${p}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Caption</label>
+      <textarea id="entryCaption" placeholder="Paste your caption here...">${caption}</textarea>
+      <div class="copy-row">
+        <button class="btn btn-ghost btn-sm" onclick="copyField('entryCaption')">📋 Copy Caption</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Poster Prompt</label>
+      <textarea id="entryPrompt" placeholder="Paste your poster / image-generation prompt here...">${prompt}</textarea>
+      <div class="copy-row">
+        <button class="btn btn-ghost btn-sm" onclick="copyField('entryPrompt')">📋 Copy Prompt</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Status</label>
+      <select id="entryStatus">
+        <option value="draft" ${status === 'draft' ? 'selected' : ''}>Draft (editable)</option>
+        <option value="posted" ${status === 'posted' ? 'selected' : ''}>Posted</option>
+      </select>
+    </div>
+  `;
+}
+
+function saveEntry() {
+  const brand = document.getElementById('entryBrand').value;
+  const platform = document.getElementById('entryPlatform').value;
+  const caption = document.getElementById('entryCaption').value;
+  const prompt = document.getElementById('entryPrompt').value;
+  const status = document.getElementById('entryStatus').value;
+
+  if (!caption.trim() && !prompt.trim()) {
+    toast('Please fill in at least a caption or a prompt.', 'error');
+    return;
+  }
+
+  const entry = {
+    brand,
+    platforms: platform ? [platform] : [],
+    caption,
+    prompt,
+    status,
+    updatedAt: new Date().toISOString()
+  };
+
+  setEntry(activeDate, entry);
+  closeModal();
+  renderCalendar();
+  toast(status === 'posted' ? 'Saved as Posted ✓' : 'Draft saved ✓');
+}
+
+function deleteEntryConfirm() {
+  if (!confirm('Delete this day\'s entry? This cannot be undone.')) return;
+  deleteEntry(activeDate);
+  closeModal();
+  renderCalendar();
+  toast('Entry deleted');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  activeDate = null;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function copyField(fieldId) {
+  const el = document.getElementById(fieldId);
+  const text = el.value;
+  if (!text.trim()) {
+    toast('Nothing to copy — field is empty.', 'error');
+    return;
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      toast('Copied ✓');
+    }).catch(() => {
+      fallbackCopy(text);
+    });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    toast('Copied ✓');
+  } catch (e) {
+    toast('Copy failed', 'error');
+  }
+  document.body.removeChild(ta);
+}
+
+function toast(msg, type) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  if (type === 'error') el.style.background = '#b33a3a';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.25s';
+    setTimeout(() => el.remove(), 260);
+  }, 1800);
+}
+
+// close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ============================================
+   INIT
+   ============================================ */
+initCalendar();
+</script>
+</body>
+</html>
